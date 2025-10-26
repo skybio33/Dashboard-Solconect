@@ -1,0 +1,114 @@
+import os
+import sys
+# DON'T CHANGE THIS !!!
+sys.path.insert(0, os.path.dirname(os.path.dirname(__file__)))
+
+from flask import Flask, send_from_directory
+from flask_cors import CORS
+from src.models.user import db
+from src.routes.user import user_bp
+from src.routes.task import task_bp
+from src.routes.auth import auth_bp
+from src.routes.export import export_bp
+from src.routes.aws_export import aws_export_bp
+
+app = Flask(__name__, static_folder=os.path.join(os.path.dirname(__file__), 'static'))
+
+# Configuração de segurança
+app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY', 'asdf#FGSgvasgf$5$WGT')
+
+# Configuração CORS
+CORS(app)
+
+# Registrar blueprints
+app.register_blueprint(user_bp, url_prefix='/api')
+app.register_blueprint(task_bp, url_prefix='/api')
+app.register_blueprint(auth_bp, url_prefix='/api/auth')
+app.register_blueprint(export_bp, url_prefix='/api/export')
+app.register_blueprint(aws_export_bp, url_prefix='/a    # Configuração do banco de dados
+    # Suporte para múltiplas plataformas: Railway, Locaweb, etc.
+    database_url = os.environ.get('DATABASE_URL')
+    
+    if database_url:
+        if database_url.startswith('postgres://'):
+            # Railway usa postgres://, mas SQLAlchemy precisa de postgresql://
+            database_url = database_url.replace('postgres://', 'postgresql://', 1)
+        elif database_url.startswith('mysql://'):
+            # Para Locaweb MySQL, converter para mysql+pymysql://
+            database_url = database_url.replace('mysql://', 'mysql+pymysql://', 1)
+    
+    app.config['SQLALCHEMY_DATABASE_URI'] = database_url or 'sqlite:///app.db' PostgreSQL em produção")
+else:
+    # Fallback para SQLite em desenvolvimento
+    db_path = os.path.join(os.path.dirname(__file__), 'database', 'app.db')
+    app.config['SQLALCHEMY_DATABASE_URI'] = f"sqlite:///{db_path}"
+    print(f"⚠️  Usando SQLite em desenvolvimento: {db_path}")
+
+app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+
+# Inicializar banco de dados
+db.init_app(app)
+
+with app.app_context():
+    # Criar todas as tabelas
+    db.create_all()
+    print("✅ Tabelas do banco de dados criadas/verificadas")
+    
+    # Criar usuários padrão se não existirem
+    from src.models.user import User
+    
+    default_users = [
+        {'username': 'Renato', 'password': 'renato123', 'role': 'admin'},
+        {'username': 'Victor', 'password': 'victor123', 'role': 'editor'},
+        {'username': 'Fabriciano', 'password': 'fabriciano123', 'role': 'admin'}
+    ]
+    
+    for user_data in default_users:
+        existing_user = User.query.filter_by(username=user_data['username']).first()
+        if not existing_user:
+            new_user = User(
+                username=user_data['username'],
+                role=user_data['role']
+            )
+            new_user.set_password(user_data['password'])
+            db.session.add(new_user)
+            print(f"✅ Usuário criado: {user_data['username']}")
+    
+    db.session.commit()
+    print("✅ Usuários padrão verificados/criados")
+    
+    # Inicializar serviço de exportação Google Drive
+    from src.services.google_drive_export import drive_exporter
+    drive_exporter.init_app(app)
+    print("✅ Serviço de exportação Google Drive inicializado")
+    
+    # Inicializar serviço de exportação AWS S3
+    from src.services.aws_s3_export import s3_exporter
+    s3_exporter.init_app(app)
+    print("✅ Serviço de exportação AWS S3 inicializado")
+
+@app.route('/', defaults={'path': ''})
+@app.route('/<path:path>')
+def serve(path):
+    static_folder_path = app.static_folder
+    if static_folder_path is None:
+        return "Static folder not configured", 404
+
+    if path != "" and os.path.exists(os.path.join(static_folder_path, path)):
+        return send_from_directory(static_folder_path, path)
+    else:
+        index_path = os.path.join(static_folder_path, 'index.html')
+        if os.path.exists(index_path):
+            return send_from_directory(static_folder_path, 'index.html')
+        else:
+            return "index.html not found", 404
+
+@app.route('/health')
+def health():
+    """Endpoint de health check para Railway"""
+    return {'status': 'healthy', 'database': 'connected'}, 200
+
+if __name__ == '__main__':
+    port = int(os.environ.get('PORT', 5000))
+    app.run(host='0.0.0.0', port=port, debug=False)
+

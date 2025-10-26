@@ -1,0 +1,93 @@
+[
+    {
+        "id": 1,
+        "title": "Prospecção - Novo Cliente Solvente Dielétrico",
+        "client": "Indústria Química Alfa",
+        "businessArea": "solvente",
+        "phase": "prospeccao",
+        "responsible": "Renato",
+        "deadline": "2025-11-01",
+        "description": "Identificar e qualificar o contato principal para a venda de material solvente.",
+        "purchasePrice": 0.00,
+        "salePrice": 1500.00,
+        "markupMargin": 0.0
+    },
+    {
+        "id": 2,
+        "title": "Proposta - Instalação Solar Fazenda Santa Maria",
+        "client": "Fazenda Santa Maria",
+        "businessArea": "solar",
+        "phase": "proposta",
+        "responsible": "Victor",
+        "deadline": "2025-10-25",
+        "description": "Elaborar proposta técnica e comercial para o projeto de energia solar. Incluir análise de viabilidade e payback.",
+        "purchasePrice": 45000.00,
+        "salePrice": 65000.00,
+        "markupMargin": 44.44
+    },
+    {
+        "id": 3,
+        "title": "Execução - Migração Cliente Mercado Livre",
+        "client": "Metalúrgica Beta",
+        "businessArea": "mercado-livre",
+        "phase": "execucao",
+        "responsible": "Fabriciano",
+        "deadline": "2025-11-15",
+        "description": "Executar a migração da Metalúrgica Beta para o Mercado Livre de Energia. Coordenar com a distribuidora local.",
+        "purchasePrice": 0.00,
+        "salePrice": 5000.00,
+        "markupMargin": 0.0
+    },
+    {
+        "id": 4,
+        "title": "Pós-Venda - Follow-up Serviço Elétrico",
+        "client": "Condomínio Residencial Gama",
+        "businessArea": "servicos-eletricos",
+        "phase": "pos-venda",
+        "responsible": "Renato",
+        "deadline": "2025-10-18",
+        "description": "Entrar em contato para verificar a satisfação com o serviço elétrico prestado e oferecer contrato de manutenção.",
+        "purchasePrice": 100.00,
+        "salePrice": 300.00,
+        "markupMargin": 200.00
+    },
+    {
+        "id": 5,
+        "title": "Proposta - Assinatura Gerenciador de Ativos",
+        "client": "Pizzaria Delta",
+        "businessArea": "ativos-web",
+        "phase": "proposta",
+        "responsible": "Victor",
+        "deadline": "2025-10-30",
+        "description": "Apresentar a proposta de assinatura do Gerenciador de Ativos Web (Web Scan 300) para a Pizzaria Delta.",
+        "purchasePrice": 50.00,
+        "salePrice": 150.00,
+        "markupMargin": 200.00
+    },
+    {
+        "id": 6,
+        "title": "Prospecção - Lead de Energia Solar",
+        "client": "Residência Epsilon",
+        "businessArea": "solar",
+        "phase": "prospeccao",
+        "responsible": "Fabriciano",
+        "deadline": "2025-11-05",
+        "description": "Qualificar lead recebido via site para instalação de painéis solares.",
+        "purchasePrice": 0.00,
+        "salePrice": 0.00,
+        "markupMargin": 0.0
+    },
+    {
+        "id": 7,
+        "title": "Execução - Entrega de Material Elétrico",
+        "client": "Construtora Zeta",
+        "businessArea": "servicos-eletricos",
+        "phase": "execucao",
+        "responsible": "Renato",
+        "deadline": "2025-10-20",
+        "description": "Organizar a logística e entrega dos materiais elétricos solicitados pela Construtora Zeta.",
+        "purchasePrice": 8000.00,
+        "salePrice": 12000.00,
+        "markupMargin": 50.00
+    }
+]
