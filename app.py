@@ -64,8 +64,8 @@ def create_tables():
     
     users_data = [
         {'username': 'Renato', 'password': 'renato123', 'role': 'admin'},
-        {'username': 'Victor', 'password': 'victor123', 'role': 'user'},
-        {'username': 'Fabriciano', 'password': 'fabriciano123', 'role': 'user'},
+        {'username': 'Victor', 'password': 'victor123', 'role': 'admin'},
+        {'username': 'Fabriciano', 'password': 'fabriciano123', 'role': 'admin'},
         {'username': 'commercial@solconect.com.br', 'password': 'solconect2024', 'role': 'admin'}
     ]
     
