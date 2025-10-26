@@ -16,7 +16,7 @@ def init_users():
         # Criar usuários padrão
         users_data = [
             {'username': 'Renato', 'password': 'renato123', 'role': 'admin', 'email': 'renato@solconect.com'},
-            {'username': 'Victor', 'password': 'victor123', 'role': 'editor', 'email': 'victor@solconect.com'},
+            {'username': 'Victor', 'password': 'victor123', 'role': 'admin', 'email': 'victor@solconect.com'},
             {'username': 'Fabriciano', 'password': 'fabriciano123', 'role': 'admin', 'email': 'fabriciano@solconect.com'}
         ]
         
