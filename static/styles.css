@@ -1,0 +1,1113 @@
+/* Reset e configurações globais */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    min-height: 100vh;
+    color: #333;
+    line-height: 1.6;
+}
+
+.container {
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 20px;
+    min-height: 100vh;
+}
+
+/* Header */
+.header {
+    background: rgba(255, 255, 255, 0.95);
+    backdrop-filter: blur(10px);
+    border-radius: 16px;
+    padding: 24px 32px;
+    margin-bottom: 24px;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 1rem;
+}
+
+.header-content {
+    text-align: center;
+}
+
+.header-title {
+    font-size: 2.5rem;
+    font-weight: 700;
+    color: #2d3748;
+    margin-bottom: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+}
+
+.header-title i {
+    color: #667eea;
+}
+
+.header-subtitle {
+    font-size: 1.1rem;
+    color: #718096;
+    font-weight: 400;
+}
+
+/* Seção de Filtros */
+.filters-section {
+    background: rgba(255, 255, 255, 0.95);
+    backdrop-filter: blur(10px);
+    border-radius: 16px;
+    padding: 24px 32px;
+    margin-bottom: 24px;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.filters-container {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 20px;
+}
+
+.filter-group {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.filter-label {
+    font-weight: 500;
+    color: #4a5568;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    white-space: nowrap;
+}
+
+.filter-select {
+    padding: 10px 16px;
+    border: 2px solid #e2e8f0;
+    border-radius: 8px;
+    background: white;
+    font-size: 14px;
+    color: #4a5568;
+    min-width: 180px;
+    transition: all 0.3s ease;
+    cursor: pointer;
+}
+
+.filter-select:focus {
+    outline: none;
+    border-color: #667eea;
+    box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+}
+
+.filter-select:hover {
+    border-color: #cbd5e0;
+}
+
+/* Estatísticas */
+.stats-container {
+    display: flex;
+    gap: 24px;
+}
+
+.stat-item {
+    text-align: center;
+    padding: 12px 20px;
+    background: linear-gradient(135deg, #667eea, #764ba2);
+    border-radius: 12px;
+    color: white;
+    min-width: 120px;
+}
+
+.stat-number {
+    display: block;
+    font-size: 1.8rem;
+    font-weight: 700;
+    line-height: 1;
+}
+
+.stat-label {
+    font-size: 0.85rem;
+    opacity: 0.9;
+    font-weight: 500;
+}
+
+.stat-profit {
+    background: linear-gradient(135deg, #10b981, #059669);
+}
+
+.stat-profit .stat-number {
+    font-size: 1.6rem;
+}
+
+/* Board Kanban */
+.kanban-board {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 20px;
+    margin-bottom: 80px;
+}
+
+.kanban-column {
+    background: rgba(255, 255, 255, 0.95);
+    backdrop-filter: blur(10px);
+    border-radius: 16px;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    overflow: hidden;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.kanban-column:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 12px 40px rgba(0, 0, 0, 0.15);
+}
+
+.column-header {
+    padding: 20px 24px;
+    background: linear-gradient(135deg, #667eea, #764ba2);
+    color: white;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.column-title {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-weight: 600;
+    font-size: 1rem;
+}
+
+.column-title i {
+    font-size: 1.1rem;
+}
+
+.column-count {
+    background: rgba(255, 255, 255, 0.2);
+    padding: 4px 12px;
+    border-radius: 20px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    min-width: 24px;
+    text-align: center;
+}
+
+.column-content {
+    padding: 20px;
+    min-height: 200px;
+    max-height: 600px;
+    overflow-y: auto;
+}
+
+/* Cartões de Tarefa */
+.task-card {
+    background: white;
+    border-radius: 12px;
+    padding: 16px;
+    margin-bottom: 12px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    border: 1px solid #e2e8f0;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    position: relative;
+}
+
+.task-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+    border-color: #667eea;
+}
+
+.task-card:last-child {
+    margin-bottom: 0;
+}
+
+.task-title {
+    font-weight: 600;
+    color: #2d3748;
+    margin-bottom: 8px;
+    font-size: 0.95rem;
+    line-height: 1.4;
+}
+
+.task-client {
+    color: #667eea;
+    font-weight: 500;
+    margin-bottom: 8px;
+    font-size: 0.9rem;
+}
+
+.task-meta {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 8px;
+}
+
+.task-area {
+    background: #f7fafc;
+    color: #4a5568;
+    padding: 4px 8px;
+    border-radius: 6px;
+    font-size: 0.75rem;
+    font-weight: 500;
+}
+
+.task-due-date {
+    font-size: 0.8rem;
+    color: #718096;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.task-responsible {
+    color: #4a5568;
+    font-size: 0.85rem;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.task-responsible i {
+    color: #a0aec0;
+}
+
+/* Cores específicas para áreas de negócio */
+.task-card[data-area="solvente"] .task-area {
+    background: #fed7d7;
+    color: #c53030;
+}
+
+.task-card[data-area="solar"] .task-area {
+    background: #fefcbf;
+    color: #d69e2e;
+}
+
+.task-card[data-area="eletricos"] .task-area {
+    background: #c6f6d5;
+    color: #38a169;
+}
+
+.task-card[data-area="mercado-livre"] .task-area {
+    background: #bee3f8;
+    color: #3182ce;
+}
+
+/* Campos Financeiros */
+.task-financial {
+    background: #f8fafc;
+    border-radius: 8px;
+    padding: 12px;
+    margin: 12px 0;
+    border: 1px solid #e2e8f0;
+}
+
+.financial-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 6px;
+}
+
+.financial-row:last-child {
+    margin-bottom: 0;
+}
+
+.financial-label {
+    font-size: 0.8rem;
+    color: #4a5568;
+    font-weight: 500;
+}
+
+.financial-value {
+    font-size: 0.85rem;
+    font-weight: 600;
+}
+
+.financial-value.purchase {
+    color: #e53e3e;
+}
+
+.financial-value.sale {
+    color: #38a169;
+}
+
+.financial-value.markup {
+    color: #3182ce;
+    background: #ebf8ff;
+    padding: 2px 6px;
+    border-radius: 4px;
+    font-size: 0.75rem;
+}
+
+.profit-row {
+    margin-top: 8px;
+    padding-top: 8px;
+    border-top: 1px solid #e2e8f0;
+}
+
+.profit-row .financial-label {
+    font-weight: 700;
+    color: #2d3748;
+}
+
+.profit-row .financial-value {
+    font-weight: 700;
+    font-size: 0.95rem;
+    color: #10b981;
+}
+
+/* Campos Financeiros no Modal de Detalhes */
+.detail-financial {
+    background: #f8fafc;
+    border-radius: 8px;
+    padding: 16px;
+    margin-top: 8px;
+}
+
+.financial-detail-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 8px;
+    padding: 4px 0;
+}
+
+.financial-detail-row:last-child {
+    margin-bottom: 0;
+}
+
+.financial-detail-row.profit {
+    border-top: 1px solid #e2e8f0;
+    padding-top: 8px;
+    margin-top: 8px;
+    font-weight: 600;
+}
+
+.financial-detail-label {
+    font-size: 0.9rem;
+    color: #4a5568;
+    font-weight: 500;
+}
+
+.financial-detail-value {
+    font-size: 0.9rem;
+    font-weight: 600;
+}
+
+.financial-detail-value.purchase {
+    color: #e53e3e;
+}
+
+.financial-detail-value.sale {
+    color: #38a169;
+}
+
+.financial-detail-value.markup {
+    color: #3182ce;
+}
+
+.financial-detail-value.profit {
+    color: #2d3748;
+    background: #e6fffa;
+    padding: 4px 8px;
+    border-radius: 4px;
+}
+
+/* Indicador de prazo vencido */
+.task-card.overdue {
+    border-left: 4px solid #e53e3e;
+}
+
+.task-card.overdue .task-due-date {
+    color: #e53e3e;
+    font-weight: 600;
+}
+
+/* Botão Flutuante */
+.floating-action {
+    position: fixed;
+    bottom: 30px;
+    right: 30px;
+    z-index: 1000;
+}
+
+.add-task-btn {
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #667eea, #764ba2);
+    border: none;
+    color: white;
+    font-size: 1.5rem;
+    cursor: pointer;
+    box-shadow: 0 8px 25px rgba(102, 126, 234, 0.4);
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.add-task-btn:hover {
+    transform: scale(1.1);
+    box-shadow: 0 12px 35px rgba(102, 126, 234, 0.6);
+}
+
+.add-task-btn:active {
+    transform: scale(0.95);
+}
+
+/* Modal */
+.modal {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5);
+    backdrop-filter: blur(5px);
+    z-index: 2000;
+    animation: fadeIn 0.3s ease;
+}
+
+.modal.show {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.modal-content {
+    background: white;
+    border-radius: 16px;
+    width: 90%;
+    max-width: 500px;
+    max-height: 90vh;
+    overflow-y: auto;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+    animation: slideUp 0.3s ease;
+}
+
+.modal-header {
+    padding: 24px 32px 16px;
+    border-bottom: 1px solid #e2e8f0;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.modal-header h2 {
+    color: #2d3748;
+    font-weight: 600;
+    font-size: 1.5rem;
+}
+
+.modal-close {
+    background: none;
+    border: none;
+    font-size: 1.5rem;
+    color: #a0aec0;
+    cursor: pointer;
+    padding: 8px;
+    border-radius: 8px;
+    transition: all 0.3s ease;
+}
+
+.modal-close:hover {
+    background: #f7fafc;
+    color: #4a5568;
+}
+
+/* Formulário */
+.task-form {
+    padding: 24px 32px 32px;
+}
+
+.form-group {
+    margin-bottom: 20px;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 6px;
+    font-weight: 500;
+    color: #4a5568;
+}
+
+.form-group input,
+.form-group select,
+.form-group textarea {
+    width: 100%;
+    padding: 12px 16px;
+    border: 2px solid #e2e8f0;
+    border-radius: 8px;
+    font-size: 14px;
+    color: #4a5568;
+    transition: all 0.3s ease;
+    background: white;
+}
+
+.form-group input:focus,
+.form-group select:focus,
+.form-group textarea:focus {
+    outline: none;
+    border-color: #667eea;
+    box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+}
+
+.form-group textarea {
+    resize: vertical;
+    min-height: 80px;
+}
+
+/* Seção Financeira do Formulário */
+.financial-section {
+    background: #f8fafc;
+    border: 1px solid #e2e8f0;
+    border-radius: 12px;
+    padding: 20px;
+    margin: 24px 0;
+}
+
+.financial-section h3 {
+    margin: 0 0 16px 0;
+    color: #2d3748;
+    font-size: 1.1rem;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.financial-section h3::before {
+    content: "💰";
+    font-size: 1.2rem;
+}
+
+.form-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+    margin-bottom: 16px;
+}
+
+.form-help {
+    display: block;
+    margin-top: 4px;
+    font-size: 0.8rem;
+    color: #718096;
+    font-style: italic;
+}
+
+.form-group input[readonly] {
+    background: #f7fafc;
+    color: #4a5568;
+    cursor: not-allowed;
+}
+
+@media (max-width: 768px) {
+    .form-row {
+        grid-template-columns: 1fr;
+        gap: 12px;
+    }
+    
+    .financial-section {
+        padding: 16px;
+        margin: 16px 0;
+    }
+}
+
+.form-actions {
+    display: flex;
+    gap: 12px;
+    justify-content: flex-end;
+    margin-top: 24px;
+}
+
+.btn {
+    padding: 12px 24px;
+    border: none;
+    border-radius: 8px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-size: 14px;
+}
+
+.btn-primary {
+    background: linear-gradient(135deg, #667eea, #764ba2);
+    color: white;
+}
+
+.btn-primary:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+}
+
+.btn-secondary {
+    background: #f7fafc;
+    color: #4a5568;
+    border: 1px solid #e2e8f0;
+}
+
+.btn-secondary:hover {
+    background: #edf2f7;
+}
+
+/* Detalhes da Tarefa */
+.task-details {
+    padding: 24px 32px 32px;
+}
+
+.detail-item {
+    margin-bottom: 16px;
+    padding-bottom: 16px;
+    border-bottom: 1px solid #f7fafc;
+}
+
+.detail-item:last-child {
+    border-bottom: none;
+    margin-bottom: 0;
+}
+
+.detail-label {
+    font-weight: 600;
+    color: #4a5568;
+    margin-bottom: 4px;
+    font-size: 0.9rem;
+}
+
+.detail-value {
+    color: #2d3748;
+    font-size: 1rem;
+}
+
+/* Animações */
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+@keyframes slideUp {
+    from {
+        opacity: 0;
+        transform: translateY(30px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Estados vazios */
+.empty-state {
+    text-align: center;
+    padding: 40px 20px;
+    color: #a0aec0;
+}
+
+.empty-state i {
+    font-size: 3rem;
+    margin-bottom: 16px;
+    opacity: 0.5;
+    color: #667eea;
+}
+
+.empty-state p {
+    font-size: 1rem;
+    font-weight: 500;
+    margin-bottom: 8px;
+}
+
+.empty-state small {
+    font-size: 0.85rem;
+    color: #718096;
+    font-style: italic;
+}
+
+/* Responsividade */
+@media (max-width: 768px) {
+    .container {
+        padding: 16px;
+    }
+    
+    .header-title {
+        font-size: 2rem;
+    }
+    
+    .filters-container {
+        flex-direction: column;
+        align-items: stretch;
+    }
+    
+    .stats-container {
+        justify-content: center;
+        flex-wrap: wrap;
+    }
+    
+    .kanban-board {
+        grid-template-columns: 1fr;
+        gap: 16px;
+    }
+    
+    .modal-content {
+        width: 95%;
+        margin: 20px;
+    }
+    
+    .task-form,
+    .modal-header,
+    .task-details {
+        padding: 20px;
+    }
+    
+    .form-actions {
+        flex-direction: column;
+    }
+    
+    .floating-action {
+        bottom: 20px;
+        right: 20px;
+    }
+}
+
+@media (max-width: 480px) {
+    .header-title {
+        font-size: 1.5rem;
+        flex-direction: column;
+        gap: 8px;
+    }
+    
+    .filter-select {
+        min-width: 140px;
+    }
+    
+    .column-title span {
+        font-size: 0.9rem;
+    }
+    
+    .add-task-btn {
+        width: 50px;
+        height: 50px;
+        font-size: 1.2rem;
+    }
+}
+
+/* Scrollbar personalizada */
+.column-content::-webkit-scrollbar {
+    width: 6px;
+}
+
+.column-content::-webkit-scrollbar-track {
+    background: #f1f1f1;
+    border-radius: 3px;
+}
+
+.column-content::-webkit-scrollbar-thumb {
+    background: #cbd5e0;
+    border-radius: 3px;
+}
+
+.column-content::-webkit-scrollbar-thumb:hover {
+    background: #a0aec0;
+}
+
+/* Sistema de Login e Privilégios */
+.user-area {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.login-area {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.user-select, .login-input {
+    padding: 0.5rem 1rem;
+    border: 2px solid #e2e8f0;
+    border-radius: 8px;
+    background: white;
+    color: #4a5568;
+    font-size: 0.9rem;
+    transition: all 0.3s ease;
+    min-width: 140px;
+}
+
+.login-input {
+    min-width: 120px;
+}
+
+.user-select:focus, .login-input:focus {
+    outline: none;
+    border-color: #667eea;
+    box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+}
+
+.login-btn, .logout-btn {
+    padding: 0.5rem 1rem;
+    border: 2px solid #667eea;
+    border-radius: 8px;
+    background: linear-gradient(135deg, #667eea, #764ba2);
+    color: white;
+    font-size: 0.9rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-weight: 500;
+}
+
+.login-btn:hover, .logout-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+}
+
+.user-info {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.current-user {
+    color: #4a5568;
+    font-weight: 500;
+    padding: 0.5rem 1rem;
+    background: #f7fafc;
+    border-radius: 8px;
+    border: 1px solid #e2e8f0;
+}
+
+/* Botão de Exclusão */
+.delete-btn {
+    position: absolute;
+    top: 8px;
+    right: 8px;
+    width: 24px;
+    height: 24px;
+    border: none;
+    border-radius: 50%;
+    background: #e53e3e;
+    color: white;
+    font-size: 12px;
+    cursor: pointer;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.3s ease;
+    z-index: 10;
+}
+
+.delete-btn:hover {
+    background: #c53030;
+    transform: scale(1.1);
+}
+
+.task-card:hover .delete-btn {
+    display: flex;
+}
+
+/* Indicadores de Privilégio */
+.privilege-indicator {
+    position: absolute;
+    top: 8px;
+    left: 8px;
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    z-index: 5;
+}
+
+.privilege-admin {
+    background: #38a169;
+}
+
+.privilege-editor {
+    background: #d69e2e;
+}
+
+.privilege-viewer {
+    background: #718096;
+}
+
+/* Estados desabilitados */
+.disabled {
+    opacity: 0.6;
+    pointer-events: none;
+}
+
+/* Mensagem de acesso negado */
+.access-denied {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: #e53e3e;
+    color: white;
+    padding: 1rem 2rem;
+    border-radius: 8px;
+    font-weight: 500;
+    z-index: 1000;
+    animation: fadeInOut 3s ease-in-out;
+}
+
+@keyframes fadeInOut {
+    0%, 100% { opacity: 0; }
+    20%, 80% { opacity: 1; }
+}
+
+/* Responsividade para área de usuário */
+@media (max-width: 768px) {
+    .header {
+        flex-direction: column;
+        text-align: center;
+    }
+    
+    .user-area {
+        width: 100%;
+        justify-content: center;
+    }
+    
+    .login-area {
+        flex-direction: column;
+        gap: 0.5rem;
+    }
+    
+    .user-select {
+        width: 200px;
+    }
+}
+
+
+/* Header Actions */
+.header-actions {
+    display: flex;
+    gap: 12px;
+    align-items: center;
+}
+
+.action-btn {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 18px;
+    border: none;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-family: 'Inter', sans-serif;
+}
+
+.reload-btn {
+    background: linear-gradient(135deg, #9f7aea, #805ad5);
+    color: white;
+    box-shadow: 0 2px 8px rgba(159, 122, 234, 0.3);
+}
+
+.reload-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(159, 122, 234, 0.4);
+}
+
+.reload-btn:disabled {
+    opacity: 0.7;
+    cursor: not-allowed;
+    transform: none;
+}
+
+.sync-btn {
+    background: linear-gradient(135deg, #48bb78, #38a169);
+    color: white;
+    box-shadow: 0 2px 8px rgba(72, 187, 120, 0.3);
+}
+
+.sync-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(72, 187, 120, 0.4);
+}
+
+.sync-btn.syncing {
+    background: linear-gradient(135deg, #ed8936, #dd6b20);
+}
+
+.sync-btn.syncing i {
+    animation: spin 1s linear infinite;
+}
+
+.sync-btn.error {
+    background: linear-gradient(135deg, #f56565, #e53e3e);
+}
+
+.export-btn {
+    background: linear-gradient(135deg, #4299e1, #3182ce);
+    color: white;
+    box-shadow: 0 2px 8px rgba(66, 153, 225, 0.3);
+}
+
+.export-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(66, 153, 225, 0.4);
+}
+
+.export-btn:active {
+    transform: translateY(0);
+}
+
+.import-btn {
+    background: linear-gradient(135deg, #48bb78, #38a169);
+    color: white;
+    box-shadow: 0 2px 8px rgba(72, 187, 120, 0.3);
+}
+
+.import-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(72, 187, 120, 0.4);
+}
+
+.import-btn:active {
+    transform: translateY(0);
+}
+
+@keyframes spin {
+    from {
+        transform: rotate(0deg);
+    }
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+/* Responsividade para os botões */
+@media (max-width: 768px) {
+    .header-actions {
+        order: 3;
+        width: 100%;
+        justify-content: center;
+    }
+    
+    .action-btn .btn-text {
+        display: none;
+    }
+    
+    .action-btn {
+        padding: 10px 14px;
+    }
+}

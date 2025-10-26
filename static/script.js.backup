@@ -1,0 +1,812 @@
+// Dados de exemplo para demonstração
+// Sistema de Usuários e Privilégios
+let currentUser = null;
+
+const users = {
+    'renato': {
+        name: 'Renato',
+        role: 'admin',
+        privileges: ['create', 'edit', 'delete', 'view']
+    },
+    'victor': {
+        name: 'Victor', 
+        role: 'editor',
+        privileges: ['create', 'edit', 'view']
+    },
+    'fabriciano': {
+        name: 'Fabriciano',
+        role: 'admin',
+        privileges: ['create', 'edit', 'delete', 'view']
+    }
+};
+
+// Função para calcular markup automaticamente
+function calculateMarkup(purchasePrice, salePrice) {
+    if (purchasePrice === 0) return 0;
+    return ((salePrice - purchasePrice) / purchasePrice) * 100;
+}
+
+// Função para calcular preço de venda baseado no markup
+function calculateSalePrice(purchasePrice, markupMargin) {
+    return purchasePrice * (1 + markupMargin / 100);
+}
+
+// Função para validar e formatar valores financeiros
+function validateFinancialValue(value) {
+    const numValue = parseFloat(value);
+    return isNaN(numValue) ? 0 : Math.max(0, numValue);
+}
+
+// Dados das tarefas - Array vazio para começar limpo
+let tasks = [];
+
+// Mapeamento de áreas de negócio
+const businessAreaMap = {
+    'solvente': 'Solvente Dielétrico',
+    'solar': 'Energia Solar',
+    'eletricos': 'Produtos Elétricos',
+    'servicos-eletricos': 'Serviços Elétricos',
+    'mercado-livre': 'Mercado Livre de Energia'
+};
+
+// Mapeamento de fases
+const phaseNames = {
+    'prospeccao': 'Prospecção e Geração de Leads',
+    'proposta': 'Proposta e Negociação',
+    'execucao': 'Execução e Entrega',
+    'pos-venda': 'Pós-Venda e Relacionamento'
+};
+// Variáveis globais
+let currentEditingTask = null;
+let filteredTasks = [...tasks];
+
+// Elementos DOM
+const businessAreaFilter = document.getElementById('businessAreaFilter');
+const responsibleFilter = document.getElementById('responsibleFilter');
+const addTaskBtn = document.getElementById('addTaskBtn');
+const taskModal = document.getElementById('taskModal');
+const taskDetailsModal = document.getElementById('taskDetailsModal');
+const taskForm = document.getElementById('taskForm');
+const closeModal = document.getElementById('closeModal');
+const closeDetailsModal = document.getElementById('closeDetailsModal');
+const cancelBtn = document.getElementById('cancelBtn');
+
+// Inicialização
+document.addEventListener('DOMContentLoaded', function() {
+    initializeApp();
+});
+
+function initializeApp() {
+    populateResponsibleFilter();
+    renderTasks();
+    updateStats();
+    setupEventListeners();
+}
+
+// Configurar event listeners
+function setupEventListeners() {
+    // Filtros
+    businessAreaFilter.addEventListener('change', applyFilters);
+    responsibleFilter.addEventListener('change', applyFilters);
+    
+    // Modal de adicionar tarefa
+    addTaskBtn.addEventListener('click', () => {
+        if (checkCreatePermission()) {
+            openAddTaskModal();
+        }
+    });
+    closeModal.addEventListener('click', closeTaskModal);
+    cancelBtn.addEventListener('click', closeTaskModal);
+    
+    // Modal de detalhes
+    closeDetailsModal.addEventListener('click', closeTaskDetailsModal);
+    
+    // Formulário
+    taskForm.addEventListener('submit', handleTaskSubmit);
+    
+    // Fechar modal clicando fora
+    taskModal.addEventListener('click', function(e) {
+        if (e.target === taskModal) {
+            closeTaskModal();
+        }
+    });
+    
+    taskDetailsModal.addEventListener('click', function(e) {
+        if (e.target === taskDetailsModal) {
+            closeTaskDetailsModal();
+        }
+    });
+    
+    // Tecla ESC para fechar modais
+    document.addEventListener('keydown', function(e) {
+        if (e.key === 'Escape') {
+            closeTaskModal();
+            closeTaskDetailsModal();
+        }
+    });
+}
+
+// Popular filtro de responsáveis
+function populateResponsibleFilter() {
+    const responsibles = [...new Set(tasks.map(task => task.responsible))].sort();
+    
+    // Limpar opções existentes (exceto "Todos")
+    responsibleFilter.innerHTML = '<option value="all">Todos</option>';
+    
+    responsibles.forEach(responsible => {
+        const option = document.createElement('option');
+        option.value = responsible;
+        option.textContent = responsible;
+        responsibleFilter.appendChild(option);
+    });
+}
+
+// Aplicar filtros
+function applyFilters() {
+    const selectedArea = businessAreaFilter.value;
+    const selectedResponsible = responsibleFilter.value;
+    
+    filteredTasks = tasks.filter(task => {
+        const areaMatch = selectedArea === 'all' || task.businessArea === selectedArea;
+        const responsibleMatch = selectedResponsible === 'all' || task.responsible === selectedResponsible;
+        return areaMatch && responsibleMatch;
+    });
+    
+    renderTasks();
+    updateStats();
+}
+
+// Renderizar tarefas no board
+function renderTasks() {
+    // Limpar todas as colunas
+    const columns = ['prospeccao', 'proposta', 'execucao', 'pos-venda'];
+    columns.forEach(phase => {
+        const container = document.getElementById(`${phase}-tasks`);
+        container.innerHTML = '';
+    });
+    
+    // Agrupar tarefas por fase
+    const tasksByPhase = {};
+    columns.forEach(phase => {
+        tasksByPhase[phase] = filteredTasks.filter(task => task.phase === phase);
+    });
+    
+    // Renderizar tarefas em cada coluna
+    columns.forEach(phase => {
+        const container = document.getElementById(`${phase}-tasks`);
+        const phaseTasks = tasksByPhase[phase];
+        
+        if (phaseTasks.length === 0) {
+            container.innerHTML = `
+                <div class="empty-state">
+                    <i class="fas fa-plus-circle"></i>
+                    <p>Pronto para novas tarefas</p>
+                    <small>Clique no botão + para adicionar</small>
+                </div>
+            `;
+        } else {
+            phaseTasks.forEach(task => {
+                const taskCard = createTaskCard(task);
+                container.appendChild(taskCard);
+            });
+        }
+        
+        // Atualizar contador da coluna
+        updateColumnCount(phase, phaseTasks.length);
+    });
+    
+    // Aplicar privilégios após renderização
+    updateDeleteButtons();
+}
+
+// Criar cartão de tarefa
+function createTaskCard(task) {
+    const card = document.createElement('div');
+    card.className = 'task-card';
+    card.setAttribute('data-area', task.businessArea);
+    card.setAttribute('data-task-id', task.id);
+    
+    // Verificar se a tarefa está vencida
+    const today = new Date();
+    const dueDate = new Date(task.dueDate);
+    const isOverdue = dueDate < today;
+    
+    if (isOverdue) {
+        card.classList.add('overdue');
+    }
+    
+    // Formatar data
+    const formattedDate = formatDate(task.dueDate);
+    
+    // Formatação de valores monetários
+    const formatCurrency = (value) => {
+        return new Intl.NumberFormat('pt-BR', {
+            style: 'currency',
+            currency: 'BRL'
+        }).format(value);
+    };
+
+    card.innerHTML = `
+        <div class="task-title">${task.title}</div>
+        <div class="task-client"><i class="fas fa-building"></i> ${task.client}</div>
+        <div class="task-meta">
+            <span class="task-area">${businessAreaMap[task.businessArea]}</span>
+            <span class="task-due-date">
+                <i class="fas fa-calendar-alt"></i>
+                ${formattedDate}
+            </span>
+        </div>
+        <div class="task-financial">
+            <div class="financial-row">
+                <span class="financial-label">Compra:</span>
+                <span class="financial-value purchase">${formatCurrency(task.purchasePrice)}</span>
+            </div>
+            <div class="financial-row">
+                <span class="financial-label">Venda:</span>
+                <span class="financial-value sale">${formatCurrency(task.salePrice)}</span>
+            </div>
+            <div class="financial-row">
+                <span class="financial-label">Markup:</span>
+                <span class="financial-value markup">${task.markupMargin.toFixed(1)}%</span>
+            </div>
+        </div>
+        <div class="task-responsible">
+            <i class="fas fa-user"></i>
+            ${task.responsible}
+        </div>
+    `;
+    
+    // Adicionar evento de clique para abrir detalhes
+    card.addEventListener('click', () => openTaskDetails(task));
+    
+    return card;
+}
+
+// Atualizar contador da coluna
+function updateColumnCount(phase, count) {
+    const column = document.querySelector(`[data-phase="${phase}"]`);
+    const countElement = column.querySelector('.column-count');
+    countElement.textContent = count;
+}
+
+// Atualizar estatísticas
+function updateStats() {
+    const totalTasks = filteredTasks.length;
+    const activeTasks = filteredTasks.filter(task => 
+        task.phase !== 'pos-venda'
+    ).length;
+    
+    document.getElementById('totalTasks').textContent = totalTasks;
+    document.getElementById('activeTasks').textContent = activeTasks;
+}
+
+// Formatar data
+function formatDate(dateString) {
+    const date = new Date(dateString);
+    return date.toLocaleDateString('pt-BR', {
+        day: '2-digit',
+        month: '2-digit',
+        year: 'numeric'
+    });
+}
+
+// Abrir modal de adicionar tarefa
+function openAddTaskModal() {
+    currentEditingTask = null;
+    document.getElementById('modalTitle').textContent = 'Adicionar Nova Tarefa';
+    taskForm.reset();
+    
+    // Definir data mínima como hoje
+    const today = new Date().toISOString().split('T')[0];
+    document.getElementById('taskDueDate').min = today;
+    
+    taskModal.classList.add('show');
+    document.body.style.overflow = 'hidden';
+}
+
+// Fechar modal de tarefa
+function closeTaskModal() {
+    taskModal.classList.remove('show');
+    document.body.style.overflow = 'auto';
+    currentEditingTask = null;
+    taskForm.reset();
+}
+
+// Abrir detalhes da tarefa
+function openTaskDetails(task) {
+    const detailsContent = document.getElementById('taskDetailsContent');
+    
+    detailsContent.innerHTML = `
+        <div class="detail-item">
+            <div class="detail-label">Título</div>
+            <div class="detail-value">${task.title}</div>
+        </div>
+        <div class="detail-item">
+            <div class="detail-label">Cliente</div>
+            <div class="detail-value">${task.client}</div>
+        </div>
+        <div class="detail-item">
+            <div class="detail-label">Área de Negócio</div>
+            <div class="detail-value">${businessAreaMap[task.businessArea]}</div>
+        </div>
+        <div class="detail-item">
+            <div class="detail-label">Fase Atual</div>
+            <div class="detail-value">${phaseMap[task.phase]}</div>
+        </div>
+        <div class="detail-item">
+            <div class="detail-label">Responsável</div>
+            <div class="detail-value">${task.responsible}</div>
+        </div>
+        <div class="detail-item">
+            <div class="detail-label">Data de Vencimento</div>
+            <div class="detail-value">${formatDate(task.dueDate)}</div>
+        </div>
+        <div class="detail-item">
+            <div class="detail-label">Informações Financeiras</div>
+            <div class="detail-financial">
+                <div class="financial-detail-row">
+                    <span class="financial-detail-label">Preço de Compra:</span>
+                    <span class="financial-detail-value purchase">${new Intl.NumberFormat('pt-BR', {style: 'currency', currency: 'BRL'}).format(task.purchasePrice)}</span>
+                </div>
+                <div class="financial-detail-row">
+                    <span class="financial-detail-label">Preço de Venda:</span>
+                    <span class="financial-detail-value sale">${new Intl.NumberFormat('pt-BR', {style: 'currency', currency: 'BRL'}).format(task.salePrice)}</span>
+                </div>
+                <div class="financial-detail-row">
+                    <span class="financial-detail-label">Margem de Markup:</span>
+                    <span class="financial-detail-value markup">${task.markupMargin.toFixed(1)}%</span>
+                </div>
+                <div class="financial-detail-row profit">
+                    <span class="financial-detail-label">Lucro Bruto:</span>
+                    <span class="financial-detail-value profit">${new Intl.NumberFormat('pt-BR', {style: 'currency', currency: 'BRL'}).format(task.salePrice - task.purchasePrice)}</span>
+                </div>
+            </div>
+        </div>
+        ${task.description ? `
+        <div class="detail-item">
+            <div class="detail-label">Descrição</div>
+            <div class="detail-value">${task.description}</div>
+        </div>
+        ` : ''}
+        <div class="form-actions">
+            <button type="button" class="btn btn-secondary" onclick="editTask(${task.id})">
+                <i class="fas fa-edit"></i> Editar
+            </button>
+            <button type="button" class="btn btn-primary" onclick="moveTaskToNextPhase(${task.id})">
+                <i class="fas fa-arrow-right"></i> Avançar Fase
+            </button>
+        </div>
+    `;
+    
+    taskDetailsModal.classList.add('show');
+    document.body.style.overflow = 'hidden';
+}
+
+// Fechar modal de detalhes
+function closeTaskDetailsModal() {
+    taskDetailsModal.classList.remove('show');
+    document.body.style.overflow = 'auto';
+}
+
+// Editar tarefa
+function editTask(taskId) {
+    if (!checkEditPermission()) return;
+    
+    const task = tasks.find(t => t.id === taskId);
+    if (!task) return;
+    
+    currentEditingTask = task;
+    
+    // Fechar modal de detalhes
+    closeTaskDetailsModal();
+    
+    // Preencher formulário
+    document.getElementById('modalTitle').textContent = 'Editar Tarefa';
+    document.getElementById('taskTitle').value = task.title;
+    document.getElementById('taskClient').value = task.client;
+    document.getElementById('taskBusinessArea').value = task.businessArea;
+    document.getElementById('taskPhase').value = task.phase;
+    document.getElementById('taskResponsible').value = task.responsible;
+    document.getElementById('taskDueDate').value = task.dueDate;
+    document.getElementById('taskDescription').value = task.description || '';
+    
+    // Abrir modal
+    taskModal.classList.add('show');
+    document.body.style.overflow = 'hidden';
+}
+
+// Mover tarefa para próxima fase
+function moveTaskToNextPhase(taskId) {
+    const task = tasks.find(t => t.id === taskId);
+    if (!task) return;
+    
+    const phases = ['prospeccao', 'proposta', 'execucao', 'pos-venda'];
+    const currentPhaseIndex = phases.indexOf(task.phase);
+    
+    if (currentPhaseIndex < phases.length - 1) {
+        task.phase = phases[currentPhaseIndex + 1];
+        
+        // Atualizar visualização
+        applyFilters();
+        closeTaskDetailsModal();
+        
+        // Mostrar notificação
+        showNotification(`Tarefa movida para: ${phaseMap[task.phase]}`, 'success');
+    } else {
+        showNotification('Tarefa já está na fase final!', 'info');
+    }
+}
+
+// Manipular envio do formulário
+function handleTaskSubmit(e) {
+    e.preventDefault();
+    
+    const formData = new FormData(taskForm);
+    const taskData = {
+        title: formData.get('title'),
+        client: formData.get('client'),
+        businessArea: formData.get('businessArea'),
+        phase: formData.get('phase'),
+        responsible: formData.get('responsible'),
+        dueDate: formData.get('dueDate'),
+        description: formData.get('description') || '',
+        purchasePrice: parseFloat(formData.get('purchasePrice')) || 0,
+        salePrice: parseFloat(formData.get('salePrice')) || 0,
+        markupMargin: parseFloat(formData.get('markupMargin')) || 0
+    };
+    
+    if (currentEditingTask) {
+        // Editar tarefa existente
+        Object.assign(currentEditingTask, taskData);
+        showNotification('Tarefa atualizada com sucesso!', 'success');
+    } else {
+        // Adicionar nova tarefa
+        taskData.id = Date.now(); // ID simples baseado em timestamp
+        tasks.push(taskData);
+        showNotification('Tarefa adicionada com sucesso!', 'success');
+    }
+    
+    // Atualizar filtros e visualização
+    populateResponsibleFilter();
+    applyFilters();
+    closeTaskModal();
+}
+
+// Mostrar notificação
+function showNotification(message, type = 'info') {
+    // Remover notificação existente
+    const existingNotification = document.querySelector('.notification');
+    if (existingNotification) {
+        existingNotification.remove();
+    }
+    
+    // Criar nova notificação
+    const notification = document.createElement('div');
+    notification.className = `notification notification-${type}`;
+    notification.innerHTML = `
+        <div class="notification-content">
+            <i class="fas fa-${type === 'success' ? 'check-circle' : 'info-circle'}"></i>
+            <span>${message}</span>
+        </div>
+    `;
+    
+    // Adicionar estilos
+    notification.style.cssText = `
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        background: ${type === 'success' ? '#48bb78' : '#4299e1'};
+        color: white;
+        padding: 16px 20px;
+        border-radius: 8px;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        z-index: 3000;
+        animation: slideInRight 0.3s ease;
+        max-width: 300px;
+    `;
+    
+    document.body.appendChild(notification);
+    
+    // Remover após 3 segundos
+    setTimeout(() => {
+        notification.style.animation = 'slideOutRight 0.3s ease';
+        setTimeout(() => {
+            if (notification.parentNode) {
+                notification.remove();
+            }
+        }, 300);
+    }, 3000);
+}
+
+// Adicionar estilos de animação para notificações
+const notificationStyles = document.createElement('style');
+notificationStyles.textContent = `
+    @keyframes slideInRight {
+        from {
+            transform: translateX(100%);
+            opacity: 0;
+        }
+        to {
+            transform: translateX(0);
+            opacity: 1;
+        }
+    }
+    
+    @keyframes slideOutRight {
+        from {
+            transform: translateX(0);
+            opacity: 1;
+        }
+        to {
+            transform: translateX(100%);
+            opacity: 0;
+        }
+    }
+    
+    .notification-content {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+    
+    .notification-content i {
+        font-size: 1.2rem;
+    }
+`;
+document.head.appendChild(notificationStyles);
+
+// Função para exportar dados (opcional)
+function exportTasks() {
+    const dataStr = JSON.stringify(tasks, null, 2);
+    const dataBlob = new Blob([dataStr], {type: 'application/json'});
+    const url = URL.createObjectURL(dataBlob);
+    
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = 'tarefas_dashboard.json';
+    link.click();
+    
+    URL.revokeObjectURL(url);
+}
+
+// Função para importar dados (opcional)
+function importTasks(event) {
+    const file = event.target.files[0];
+    if (!file) return;
+    
+    const reader = new FileReader();
+    reader.onload = function(e) {
+        try {
+            const importedTasks = JSON.parse(e.target.result);
+            tasks = importedTasks;
+            populateResponsibleFilter();
+            applyFilters();
+            showNotification('Dados importados com sucesso!', 'success');
+        } catch (error) {
+            showNotification('Erro ao importar dados. Verifique o formato do arquivo.', 'error');
+        }
+    };
+    reader.readAsText(file);
+}
+
+// Funções de Login e Privilégios
+function initializeAuth() {
+    const loginBtn = document.getElementById('loginBtn');
+    const logoutBtn = document.getElementById('logoutBtn');
+    const userSelect = document.getElementById('userSelect');
+    
+    loginBtn.addEventListener('click', handleLogin);
+    logoutBtn.addEventListener('click', handleLogout);
+    
+    // Verificar se há usuário logado salvo
+    const savedUser = localStorage.getItem('currentUser');
+    if (savedUser) {
+        currentUser = users[savedUser];
+        updateUserInterface();
+    }
+}
+
+function handleLogin() {
+    const userSelect = document.getElementById('userSelect');
+    const selectedUser = userSelect.value;
+    
+    if (selectedUser && users[selectedUser]) {
+        currentUser = users[selectedUser];
+        localStorage.setItem('currentUser', selectedUser);
+        updateUserInterface();
+        applyPrivileges();
+        showMessage(`Bem-vindo, ${currentUser.name}!`, 'success');
+    } else {
+        showMessage('Por favor, selecione um usuário válido.', 'error');
+    }
+}
+
+function handleLogout() {
+    currentUser = null;
+    localStorage.removeItem('currentUser');
+    updateUserInterface();
+    applyPrivileges();
+    showMessage('Logout realizado com sucesso!', 'success');
+}
+
+function updateUserInterface() {
+    const loginArea = document.getElementById('loginArea');
+    const userInfo = document.getElementById('userInfo');
+    const currentUserSpan = document.getElementById('currentUser');
+    
+    if (currentUser) {
+        loginArea.style.display = 'none';
+        userInfo.style.display = 'flex';
+        currentUserSpan.textContent = `${currentUser.name} (${getRoleDisplayName(currentUser.role)})`;
+    } else {
+        loginArea.style.display = 'flex';
+        userInfo.style.display = 'none';
+    }
+}
+
+function getRoleDisplayName(role) {
+    const roleNames = {
+        'admin': 'Administrador',
+        'editor': 'Editor',
+        'viewer': 'Visualizador'
+    };
+    return roleNames[role] || role;
+}
+
+function hasPrivilege(privilege) {
+    return currentUser && currentUser.privileges.includes(privilege);
+}
+
+function applyPrivileges() {
+    const addTaskBtn = document.querySelector('.add-task-btn');
+    const filterSection = document.querySelector('.filters-section');
+    
+    if (!currentUser) {
+        // Usuário não logado - desabilitar tudo
+        if (addTaskBtn) addTaskBtn.style.display = 'none';
+        if (filterSection) filterSection.classList.add('disabled');
+        document.querySelectorAll('.task-card').forEach(card => {
+            card.classList.add('disabled');
+        });
+        return;
+    }
+    
+    // Aplicar privilégios baseados no usuário logado
+    if (hasPrivilege('create')) {
+        if (addTaskBtn) addTaskBtn.style.display = 'flex';
+    } else {
+        if (addTaskBtn) addTaskBtn.style.display = 'none';
+    }
+    
+    // Remover classe disabled se usuário tem privilégio de visualização
+    if (hasPrivilege('view')) {
+        if (filterSection) filterSection.classList.remove('disabled');
+        document.querySelectorAll('.task-card').forEach(card => {
+            card.classList.remove('disabled');
+        });
+    }
+    
+    // Atualizar botões de exclusão
+    updateDeleteButtons();
+}
+
+function updateDeleteButtons() {
+    document.querySelectorAll('.delete-btn').forEach(btn => btn.remove());
+    
+    if (hasPrivilege('delete')) {
+        document.querySelectorAll('.task-card').forEach(card => {
+            if (!card.querySelector('.delete-btn')) {
+                const deleteBtn = document.createElement('button');
+                deleteBtn.className = 'delete-btn';
+                deleteBtn.innerHTML = '<i class="fas fa-times"></i>';
+                deleteBtn.title = 'Excluir tarefa';
+                deleteBtn.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    const taskId = parseInt(card.dataset.taskId);
+                    deleteTask(taskId);
+                });
+                card.appendChild(deleteBtn);
+            }
+        });
+    }
+}
+
+function deleteTask(taskId) {
+    if (!hasPrivilege('delete')) {
+        showMessage('Você não tem permissão para excluir tarefas.', 'error');
+        return;
+    }
+    
+    if (confirm('Tem certeza que deseja excluir esta tarefa?')) {
+        tasks = tasks.filter(task => task.id !== taskId);
+        renderTasks();
+        updateStats();
+        autoSave();
+        showMessage('Tarefa excluída com sucesso!', 'success');
+    }
+}
+
+function showMessage(message, type = 'info') {
+    const messageDiv = document.createElement('div');
+    messageDiv.className = `access-denied ${type}`;
+    messageDiv.textContent = message;
+    document.body.appendChild(messageDiv);
+    
+    setTimeout(() => {
+        messageDiv.remove();
+    }, 3000);
+}
+
+function checkEditPermission() {
+    if (!hasPrivilege('edit')) {
+        showMessage('Você não tem permissão para editar tarefas.', 'error');
+        return false;
+    }
+    return true;
+}
+
+function checkCreatePermission() {
+    if (!hasPrivilege('create')) {
+        showMessage('Você não tem permissão para criar tarefas.', 'error');
+        return false;
+    }
+    return true;
+}
+
+// Salvar dados no localStorage (persistência local)
+function saveToLocalStorage() {
+    localStorage.setItem('dashboardTasks', JSON.stringify(tasks));
+}
+
+// Carregar dados do localStorage
+function loadFromLocalStorage() {
+    const savedTasks = localStorage.getItem('dashboardTasks');
+    if (savedTasks) {
+        try {
+            tasks = JSON.parse(savedTasks);
+        } catch (error) {
+            console.error('Erro ao carregar dados salvos:', error);
+        }
+    }
+}
+
+// Salvar automaticamente a cada mudança
+function autoSave() {
+    saveToLocalStorage();
+}
+
+// Configurar event listeners para campos financeiros
+function setupFinancialListeners() {
+    const purchaseInput = document.getElementById('taskPurchasePrice');
+    const saleInput = document.getElementById('taskSalePrice');
+    const markupInput = document.getElementById('taskMarkupMargin');
+    
+    if (purchaseInput && saleInput && markupInput) {
+        // Atualizar markup quando preços mudarem
+        purchaseInput.addEventListener('input', () => {
+            const purchasePrice = validateFinancialValue(purchaseInput.value);
+            const salePrice = validateFinancialValue(saleInput.value);
+            const calculatedMarkup = calculateMarkup(purchasePrice, salePrice);
+            markupInput.value = calculatedMarkup.toFixed(1);
+        });
+        
+        saleInput.addEventListener('input', () => {
+            const purchasePrice = validateFinancialValue(purchaseInput.value);
+            const salePrice = validateFinancialValue(saleInput.value);
+            const calculatedMarkup = calculateMarkup(purchasePrice, salePrice);
+            markupInput.value = calculatedMarkup.toFixed(1);
+        });
+    }
+}
+
+// Carregar dados salvos na inicialização
+document.addEventListener('DOMContentLoaded', function() {
+    loadFromLocalStorage();
+    initializeAuth();
+    initializeApp();
+    applyPrivileges();
+    setupFinancialListeners();
+});
+
+// Salvar automaticamente quando houver mudanças
+window.addEventListener('beforeunload', autoSave);

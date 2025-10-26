@@ -1,0 +1,24 @@
+# render.yaml
+# Define a infraestrutura do seu projeto no Render
+services:
+  # 1. Serviço Web (Dashboard Flask)
+  # O banco de dados (PostgreSQL) deve ser criado separadamente no painel do Render
+  # e conectado a este serviço web. O Render injetará a DATABASE_URL automaticamente.
+  - type: web
+    name: solconect-dashboard
+    env: python
+    region: oregon # Escolha a região mais próxima do seu público
+    buildCommand: "pip install -r requirements.txt"
+    # CORREÇÃO: O ponto de entrada correto é 'app:app' (arquivo 'app.py', variável 'app')
+    startCommand: "gunicorn --bind 0.0.0.0:$PORT app:app"
+    # Variáveis de ambiente
+    envVars:
+      # A variável DATABASE_URL será injetada automaticamente pelo Render
+      # quando você conectar um serviço de banco de dados nativo a este serviço web.
+      - key: PYTHON_VERSION
+        value: 3.11.0 # Define explicitamente a versão do Python
+      - key: SECRET_KEY
+        generateValue: true # Gera uma chave secreta automaticamente
+      - key: FLASK_ENV
+        value: production
+

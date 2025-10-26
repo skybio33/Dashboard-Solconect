@@ -1,0 +1,285 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard de Tarefas - Fluxo de Trabalho</title>
+    <link rel="stylesheet" href="styles.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#667eea">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
+    <meta name="apple-mobile-web-app-title" content="Dashboard Tarefas">
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <header class="header">
+            <div class="header-content">
+                <h1 class="header-title">
+                    <i class="fas fa-chart-line"></i>
+                    Dashboard de Tarefas
+                </h1>
+                <p class="header-subtitle">Gestão do Fluxo de Trabalho</p>
+            </div>
+            <div class="header-actions">
+                <button id="reloadBtn" class="action-btn reload-btn" title="Recarregar dados do banco de dados">
+                    <i class="fas fa-database"></i>
+                    <span class="btn-text">Recarregar Dados</span>
+                </button>
+                <button id="syncBtn" class="action-btn sync-btn" title="Sincronizar com banco de dados">
+                    <i class="fas fa-sync-alt"></i>
+                    <span class="btn-text">Sincronizado</span>
+                </button>
+                <button id="exportBtn" class="action-btn export-btn" title="Exportar dados">
+                    <i class="fas fa-download"></i>
+                    <span class="btn-text">Exportar</span>
+                </button>
+                <button id="importBtn" class="action-btn import-btn" title="Importar dados de backup">
+                    <i class="fas fa-upload"></i>
+                    <span class="btn-text">Importar</span>
+                </button>
+                <input type="file" id="importFile" accept=".json" style="display: none;" />
+            </div>
+            <div class="user-area">
+                <div id="loginArea" class="login-area">
+                    <input type="text" id="usernameInput" class="login-input" placeholder="Usuário" />
+                    <input type="password" id="passwordInput" class="login-input" placeholder="Senha" />
+                    <button id="loginBtn" class="login-btn">
+                        <i class="fas fa-sign-in-alt"></i> Entrar
+                    </button>
+                </div>
+                <div id="userInfo" class="user-info" style="display: none;">
+                    <span id="currentUser" class="current-user"></span>
+                    <button id="logoutBtn" class="logout-btn">
+                        <i class="fas fa-sign-out-alt"></i> Sair
+                    </button>
+                </div>
+            </div>
+        </header>
+
+        <!-- Filtros -->
+        <section class="filters-section">
+            <div class="filters-container">
+                <div class="filter-group">
+                    <label for="businessAreaFilter" class="filter-label">
+                        <i class="fas fa-filter"></i>
+                        Área de Negócio:
+                    </label>
+                    <select id="businessAreaFilter" class="filter-select">
+                        <option value="all">Todas as Áreas</option>
+                        <option value="solvente">Solvente Dielétrico</option>
+                        <option value="solar">Energia Solar</option>
+                        <option value="servicos-eletricos">Vendas e Serviços Elétricos</option>
+                        <option value="ativos-web">Gerenciador de Ativos Web</option>
+                        <option value="mercado-livre">Mercado Livre</option>
+                    </select>
+                </div>
+                
+                <div class="filter-group">
+                    <label for="responsibleFilter" class="filter-label">
+                        <i class="fas fa-user"></i>
+                        Responsável:
+                    </label>
+                    <select id="responsibleFilter" class="filter-select">
+                        <option value="all">Todos</option>
+                    </select>
+                </div>
+
+                <div class="stats-container">
+                    <div class="stat-item">
+                        <span class="stat-number" id="totalTasks">0</span>
+                        <span class="stat-label">Total de Tarefas</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-number" id="activeTasks">0</span>
+                        <span class="stat-label">Em Andamento</span>
+                    </div>
+                    <div class="stat-item stat-profit">
+                        <span class="stat-number" id="totalProfit">R$ 0,00</span>
+                        <span class="stat-label">Lucro Total</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Board Kanban -->
+        <main class="kanban-board">
+            <div class="kanban-column" data-phase="prospeccao">
+                <div class="column-header">
+                    <div class="column-title">
+                        <i class="fas fa-search"></i>
+                        <span>Prospecção e Geração de Leads</span>
+                    </div>
+                    <div class="column-count">0</div>
+                </div>
+                <div class="column-content" id="prospeccao-tasks">
+                    <!-- Tarefas serão inseridas aqui via JavaScript -->
+                </div>
+            </div>
+
+
+
+            <div class="kanban-column" data-phase="proposta">
+                <div class="column-header">
+                    <div class="column-title">
+                        <i class="fas fa-handshake"></i>
+                        <span>Proposta e Negociação</span>
+                    </div>
+                    <div class="column-count">0</div>
+                </div>
+                <div class="column-content" id="proposta-tasks">
+                    <!-- Tarefas serão inseridas aqui via JavaScript -->
+                </div>
+            </div>
+
+            <div class="kanban-column" data-phase="execucao">
+                <div class="column-header">
+                    <div class="column-title">
+                        <i class="fas fa-cogs"></i>
+                        <span>Execução e Entrega</span>
+                    </div>
+                    <div class="column-count">0</div>
+                </div>
+                <div class="column-content" id="execucao-tasks">
+                    <!-- Tarefas serão inseridas aqui via JavaScript -->
+                </div>
+            </div>
+
+            <div class="kanban-column" data-phase="pos-venda">
+                <div class="column-header">
+                    <div class="column-title">
+                        <i class="fas fa-heart"></i>
+                        <span>Pós-Venda e Relacionamento</span>
+                    </div>
+                    <div class="column-count">0</div>
+                </div>
+                <div class="column-content" id="pos-venda-tasks">
+                    <!-- Tarefas serão inseridas aqui via JavaScript -->
+                </div>
+            </div>
+        </main>
+
+        <!-- Botão de Adicionar Tarefa -->
+        <div class="floating-action">
+            <button id="addTaskBtn" class="add-task-btn" title="Adicionar Nova Tarefa">
+                <i class="fas fa-plus"></i>
+            </button>
+        </div>
+    </div>
+
+    <!-- Modal para Adicionar/Editar Tarefa -->
+    <div id="taskModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 id="modalTitle">Adicionar Nova Tarefa</h2>
+                <button class="modal-close" id="closeModal">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <form id="taskForm" class="task-form">
+                <div class="form-group">
+                    <label for="taskTitle">Título da Tarefa:</label>
+                    <input type="text" id="taskTitle" name="title" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="taskClient">Cliente:</label>
+                    <input type="text" id="taskClient" name="client" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="taskBusinessArea">Área de Negócio:</label>
+                    <select id="taskBusinessArea" name="businessArea" required>
+                        <option value="">Selecione uma área</option>
+                        <option value="solvente">Solvente Dielétrico</option>
+                        <option value="solar">Energia Solar</option>
+                        <option value="servicos-eletricos">Vendas e Serviços Elétricos</option>
+                        <option value="ativos-web">Gerenciador de Ativos Web</option>
+                        <option value="mercado-livre">Mercado Livre</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label for="taskPhase">Fase:</label>
+                    <select id="taskPhase" name="phase" required>
+                        <option value="">Selecione uma fase</option>
+                        <option value="prospeccao">Prospecção e Geração de Leads</option>
+                        <option value="proposta">Proposta e Negociação</option>
+                        <option value="execucao">Execução e Entrega</option>
+                        <option value="pos-venda">Pós-Venda e Relacionamento</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label for="taskResponsible">Responsável:</label>
+                    <input type="text" id="taskResponsible" name="responsible" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="taskDueDate">Data de Vencimento:</label>
+                    <input type="date" id="taskDueDate" name="dueDate" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="taskDescription">Descrição (opcional):</label>
+                    <textarea id="taskDescription" name="description" rows="3"></textarea>
+                </div>
+                
+                <div class="financial-section">
+                    <h3>Informações Financeiras</h3>
+                    
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="taskPurchasePrice">Preço de Compra (R$):</label>
+                            <input type="number" id="taskPurchasePrice" name="purchasePrice" 
+                                   min="0" step="0.01" placeholder="0,00">
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="taskSalePrice">Preço de Venda (R$):</label>
+                            <input type="number" id="taskSalePrice" name="salePrice" 
+                                   min="0" step="0.01" placeholder="0,00">
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="taskMarkupMargin">Margem de Markup (%):</label>
+                        <input type="number" id="taskMarkupMargin" name="markupMargin" 
+                               min="0" step="0.1" placeholder="0,0" readonly>
+                        <small class="form-help">Calculado automaticamente com base nos preços</small>
+                    </div>
+                </div>
+                
+                <div class="form-actions">
+                    <button type="button" id="cancelBtn" class="btn btn-secondary">Cancelar</button>
+                    <button type="submit" class="btn btn-primary">Salvar Tarefa</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Modal para Detalhes da Tarefa -->
+    <div id="taskDetailsModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Detalhes da Tarefa</h2>
+                <button class="modal-close" id="closeDetailsModal">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div id="taskDetailsContent" class="task-details">
+                <!-- Conteúdo será preenchido via JavaScript -->
+            </div>
+        </div>
+    </div>
+
+    <script src="auth-api.js"></script>
+    <script src="api.js"></script>
+    <script src="script.js"></script>
+
+
+</body>
+</html>

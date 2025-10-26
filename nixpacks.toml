@@ -1,0 +1,9 @@
+[phases.setup]
+nixPkgs = ["python311", "postgresql"]
+
+[phases.install]
+cmds = ["pip install -r requirements.txt"]
+
+[start]
+cmd = "gunicorn src.main:app --bind 0.0.0.0:$PORT --workers 2 --threads 4 --timeout 120"
+
