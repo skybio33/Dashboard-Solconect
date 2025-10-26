@@ -22,7 +22,7 @@ def init_database():
         # Usuários padrão
         default_users = [
             {'username': 'Renato', 'password': 'renato123', 'role': 'admin'},
-            {'username': 'Victor', 'password': 'victor123', 'role': 'editor'},
+            {'username': 'Victor', 'password': 'victor123', 'role': 'admin'},
             {'username': 'Fabriciano', 'password': 'fabriciano123', 'role': 'admin'}
         ]
         
