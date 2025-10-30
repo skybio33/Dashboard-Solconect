@@ -1,3 +1,4 @@
+
 name: Build React App
 
 on:
@@ -11,10 +12,10 @@ jobs:
     
     steps:
     - name: Checkout código
-      uses: actions/checkout@v3
+      uses: actions/checkout@v4
     
     - name: Setup Node.js
-      uses: actions/setup-node@v3
+      uses: actions/setup-node@v4
       with:
         node-version: '18'
         cache: 'npm'
@@ -34,7 +35,7 @@ jobs:
         cd ..
     
     - name: Upload do Build como Artifact
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       with:
         name: solconect-build
         path: solconect-build.zip
