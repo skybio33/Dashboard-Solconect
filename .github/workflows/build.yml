@@ -1,0 +1,49 @@
+name: Build React App
+
+on:
+  push:
+    branches: [ main, master ]
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout código
+      uses: actions/checkout@v3
+    
+    - name: Setup Node.js
+      uses: actions/setup-node@v3
+      with:
+        node-version: '18'
+        cache: 'npm'
+    
+    - name: Instalar dependências
+      run: npm ci
+    
+    - name: Build do projeto
+      run: npm run build
+      env:
+        CI: false
+    
+    - name: Criar arquivo ZIP do build
+      run: |
+        cd build
+        zip -r ../solconect-build.zip .
+        cd ..
+    
+    - name: Upload do Build como Artifact
+      uses: actions/upload-artifact@v3
+      with:
+        name: solconect-build
+        path: solconect-build.zip
+        retention-days: 30
+    
+    - name: Criar Release (opcional)
+      uses: softprops/action-gh-release@v1
+      if: startsWith(github.ref, 'refs/tags/')
+      with:
+        files: solconect-build.zip
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
